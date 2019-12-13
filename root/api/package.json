@@ -16,7 +16,7 @@
   "scripts": {
     "lint:fix": "eslint --fix .",
     "lint": "eslint .",
-    "pretest": "eslint --fix ."
+    "pretest": "eslint ."
   },
   "husky": {
     "hooks": {
