@@ -8,6 +8,8 @@ function challenges(dependencies) {
   collection2019['03-02'] = require('./2019/03-02.js')(dependencies);
   collection2019['04-01'] = require('./2019/04-01.js')(dependencies);
   collection2019['04-02'] = require('./2019/04-02.js')(dependencies);
+  collection2019['05-01'] = require('./2019/05-01.js')(dependencies);
+  collection2019['05-02'] = require('./2019/05-02.js')(dependencies);
 
   const years = {};
   years['2019'] = collection2019;
