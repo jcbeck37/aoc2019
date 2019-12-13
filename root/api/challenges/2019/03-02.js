@@ -1,9 +1,9 @@
 function crossedWires() {
   function processInput(input) {
     const wirePaths = input.split('\n');
-    const sample0 = 'R8,U5,L5,D3\nU7,R6,D4,L4';
-    const sample1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83';
-    const sample2 = 'R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7';
+    // const sample0 = 'R8,U5,L5,D3\nU7,R6,D4,L4';
+    // const sample1 = 'R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83';
+    // const sample2 = 'R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7';
     // const wirePaths = sample2.split('\n');
 
     const result1 = populateWire(wirePaths[0]);
@@ -12,7 +12,6 @@ function crossedWires() {
   }
 
   function populateWire(wirePath, oldWire) {
-    const shortest = 0;
     let fewestSteps = 0;
     const directions = wirePath.split(',');
 
@@ -54,6 +53,7 @@ function crossedWires() {
               fewestSteps = totalSteps;
               console.log(`Fewer steps: ${fewestSteps}`);
             }
+            return false;
           });
         }
       }
@@ -61,6 +61,8 @@ function crossedWires() {
       // console.log(`NEW: (${x},${y},${nextX},${nextY})`);
       x = nextX;
       y = nextY;
+
+      return false;
     });
 
     return {
@@ -76,6 +78,7 @@ function crossedWires() {
         const [x1, y1, x2, y2] = path;
         steps += countSteps(x1, y1, x2, y2);
       }
+      return false;
     });
 
     return steps;
@@ -93,7 +96,7 @@ function crossedWires() {
 
     wire1.map((wire, idx) => {
       const intersectsAt = comparePaths(wire, path);
-      if (intersectsAt[0] != 0 || intersectsAt[1] != 0) {
+      if (intersectsAt[0] !== 0 || intersectsAt[1] !== 0) {
         console.log(`Intersection after ${idx} at (${intersectsAt[0]},${intersectsAt[1]})`);
         const result = {
           idx,
@@ -101,6 +104,7 @@ function crossedWires() {
         };
         results.push(result);
       }
+      return false;
     });
 
     return results;

@@ -1,9 +1,9 @@
 function crossedWires() {
   function processInput(input) {
     const wirePaths = input.split('\n');
-    // const sample = "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83";
-    // const sample = "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
-    // const wirePaths = sample.split('\n');
+    // let s1 = "R75,D30,R83,U83,L12,D49,R71,U7,L72\nU62,R66,U55,R34,D71,R55,D58,R83";
+    // let s2 = "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\nU98,R91,D20,R16,D67,R40,U7,R15,U6,R7";
+    // const wirePaths = s1.split('\n');
 
     const result1 = populateWire(wirePaths[0]);
     const result2 = populateWire(wirePaths[1], result1.wireCoords);
@@ -42,6 +42,8 @@ function crossedWires() {
       console.log(`NEW: (${x},${y},${nextX},${nextY})`);
       x = nextX;
       y = nextY;
+
+      return null;
     });
 
     return {
@@ -59,6 +61,7 @@ function crossedWires() {
         cross = check;
         console.log(`Intersection: ${check}`);
       }
+      return null;
     });
 
     return cross;

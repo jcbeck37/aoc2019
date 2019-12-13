@@ -15,7 +15,7 @@
   "scripts": {
     "lint:fix": "eslint --fix .",
     "lint": "eslint .",
-    "pretest": "./node_modules/.bin/eslint --ignore-path .gitignore . --fix"
+    "pretest": "eslint --fix ."
   },
   "husky": {
     "hooks": {

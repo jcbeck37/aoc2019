@@ -1,6 +1,7 @@
 function router(dependencies) {
+  const challengeRouter = require('./challenges')(dependencies);
   return {
-    challenges: require('./challenges')(dependencies),
+    challenges: challengeRouter,
   };
 }
 

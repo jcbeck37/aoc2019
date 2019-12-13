@@ -1,4 +1,4 @@
-function shipComputer({ }) {
+function shipComputer() {
   const operations = [];
   operations[1] = function (a, b) { return a + b; };
   operations[2] = function (a, b) { return a * b; };
@@ -16,8 +16,8 @@ function shipComputer({ }) {
     // return programAlarm[0];
 
     // brute force
-    for (let i = 0; i < 100; i++) {
-      for (let j = 0; j < 100; j++) {
+    for (let i = 0; i < 100; i += 1) {
+      for (let j = 0; j < 100; j += 1) {
         mem = input.split(','); // initialize
         mem[1] = i;
         mem[2] = j;
@@ -31,10 +31,13 @@ function shipComputer({ }) {
       }
       console.log(`${i + 1}% complete.`);
     }
+
+    return 'Could not find valid inputs';
   }
 
 
   function processOpcode(pointer, mem) {
+    const newMem = mem;
     const opCode = Number(mem[pointer]);
     if (opCode === 99) {
       // console.log(`Exit program: ${mem.toString()}`);
@@ -43,11 +46,12 @@ function shipComputer({ }) {
     const val1 = Number(mem[mem[pointer + 1]]);
     const val2 = Number(mem[mem[pointer + 2]]);
     const result = operations[opCode](val1, val2);
-    mem[mem[pointer + 3]] = result;
-    // console.log(`${val1} ${opCode == 1 ? "+" : "*"} ${val2} = ${result} set to position ${mem[pointer + 3]}`);
+    newMem[mem[pointer + 3]] = result;
+    // console.log(`${val1} ${opCode == 1 ? "+" : "*"}
+    //  ${val2} = ${result} set to position ${mem[pointer + 3]}`);
     // console.log(`Register: ${mem.toString()}`);
 
-    return processOpcode(pointer + 4, mem);
+    return processOpcode(pointer + 4, newMem);
   }
 
   return {

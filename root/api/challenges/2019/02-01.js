@@ -13,6 +13,7 @@ function shipComputer() {
   }
 
   function processOpcode(pointer, dataPoints) {
+    const newRegister = dataPoints;
     const opCode = Number(dataPoints[pointer]);
     if (opCode === 99) {
       console.log(`Exit program: ${dataPoints.toString()}`);
@@ -29,10 +30,10 @@ function shipComputer() {
 
     // console.log(`pointer: ${pointer} : opcode ${opCode}`);
     console.log(`${val1} ${operator} ${val2} = ${result} set to position ${resultPosition}`);
-    dataPoints[resultPosition] = result;
+    newRegister[resultPosition] = result;
     // console.log(`New dataset: ${dataPoints.toString()}`);
 
-    return processOpcode(pointer + 4, dataPoints);
+    return processOpcode(pointer + 4, newRegister);
   }
 
   return {
