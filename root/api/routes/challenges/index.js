@@ -15,8 +15,14 @@ function challengeRoutes(dependencies) {
 
   myRouter.post('/:year/:part', (req, res) => {
     const { year, part } = req.params;
-    const inputFile = req.files.input;
-    return controllers.challenges.processInput(year, part, inputFile.data.toString('ascii'))
+    let input;
+    if (req.files !== undefined) {
+      const inputFile = req.files.input;
+      input = inputFile.data.toString('ascii');
+    } else {
+      input = req.body.input;
+    }
+    return controllers.challenges.processInput(year, part, input)
       .then((resp) => {
         res.status(resp.status).json(resp.payload);
       });

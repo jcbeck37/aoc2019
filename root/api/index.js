@@ -1,5 +1,5 @@
 const http = require('http');
-// const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 const express = require('express');
 const fileUpload = require('express-fileupload');
 
@@ -7,6 +7,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 const serverPort = 8080;
 app.use(fileUpload());
+app.use(bodyParser.json());
 
 const challenges = require('./challenges')({}); // { services, helpers, models });
 const controllers = require('./controllers')({ challenges });
