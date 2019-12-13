@@ -4,7 +4,7 @@ function challengesController(dependencies) {
   function getView(year, part) {
     return Promise.resolve({
       status: 200,
-      payload: `Year: ${year}, Part: ${part}`
+      payload: `Year: ${year}, Part: ${part}`,
     });
   }
 
@@ -13,13 +13,13 @@ function challengesController(dependencies) {
 
     return Promise.resolve({
       status: 200,
-      payload: res
+      payload: res,
     });
   }
 
   return {
     getView,
-    processInput
+    processInput,
   };
 }
 

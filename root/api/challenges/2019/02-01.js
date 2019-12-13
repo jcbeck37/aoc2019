@@ -1,6 +1,6 @@
-function shipComputer({}) {
+function shipComputer() {
   function processInput(input) {
-    let dataPoints = input.split(',');
+    const dataPoints = input.split(',');
 
     // restore "1202 program alarm"
     dataPoints[1] = 12;
@@ -18,25 +18,25 @@ function shipComputer({}) {
       console.log(`Exit program: ${dataPoints.toString()}`);
       return dataPoints;
     }
-    const operator = opCode === 1 ? "+" : "*";
-    const val1Pos = dataPoints[pointer+1];
-    const val2Pos = dataPoints[pointer+2];
-    const resultPosition = dataPoints[pointer+3];
+    const operator = opCode === 1 ? '+' : '*';
+    const val1Pos = dataPoints[pointer + 1];
+    const val2Pos = dataPoints[pointer + 2];
+    const resultPosition = dataPoints[pointer + 3];
 
     const val1 = Number(dataPoints[val1Pos]);
     const val2 = Number(dataPoints[val2Pos]);
     const result = opCode === 1 ? val1 + val2 : val1 * val2;
 
-    //console.log(`pointer: ${pointer} : opcode ${opCode}`);
+    // console.log(`pointer: ${pointer} : opcode ${opCode}`);
     console.log(`${val1} ${operator} ${val2} = ${result} set to position ${resultPosition}`);
     dataPoints[resultPosition] = result;
-    //console.log(`New dataset: ${dataPoints.toString()}`);
+    // console.log(`New dataset: ${dataPoints.toString()}`);
 
     return processOpcode(pointer + 4, dataPoints);
   }
 
   return {
-    processInput
+    processInput,
   };
 }
 

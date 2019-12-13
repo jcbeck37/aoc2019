@@ -1,6 +1,6 @@
 function controllers(dependencies) {
   return {
-    challenges: require("./challenges")(dependencies)
+    challenges: require('./challenges')(dependencies),
   };
 }
 

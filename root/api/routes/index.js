@@ -1,6 +1,6 @@
 function router(dependencies) {
   return {
-    challenges: require("./challenges")(dependencies)
+    challenges: require('./challenges')(dependencies),
   };
 }
 
