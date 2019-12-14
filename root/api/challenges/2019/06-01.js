@@ -1,6 +1,4 @@
 function orbitMapper() {
-
-
   function processInput(input) {
     let splitter = endOfLine = require('os').EOL;
     //const s0 = "COM)B\nB)C\nC)D\nD)E\nE)F\nB)G\nG)H\nD)I\nE)J\nJ)K\nK)L";
