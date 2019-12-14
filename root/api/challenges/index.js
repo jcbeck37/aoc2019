@@ -10,6 +10,7 @@ function challenges(dependencies) {
   collection2019['04-02'] = require('./2019/04-02.js')(dependencies);
   collection2019['05-01'] = require('./2019/05-01.js')(dependencies);
   collection2019['05-02'] = require('./2019/05-02.js')(dependencies);
+  collection2019['05-alt'] = require('./2019/05-alt.js')(dependencies);
   collection2019['06-01'] = require('./2019/06-01.js')(dependencies);
   collection2019['06-02'] = require('./2019/06-02.js')(dependencies);
   collection2019['07-01'] = require('./2019/07-01.js')(dependencies);

@@ -9,7 +9,8 @@ const serverPort = 8080;
 app.use(fileUpload());
 app.use(bodyParser.json());
 
-const challenges = require('./challenges')({}); // { services, helpers, models });
+const utilities = require('./utilities')();
+const challenges = require('./challenges')({ utilities }); // { services, helpers, models });
 const controllers = require('./controllers')({ challenges });
 const routes = require('./routes')({
   router: express,

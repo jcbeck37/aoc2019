@@ -1,203 +1,76 @@
-function shipComputer() {
-  const operations = [];
-  operations[1] = function (a, b) { return a + b; };
-  operations[2] = function (a, b) { return a * b; };
-
-  let phaseSettings = [];
-  let ampPhase = 0;
-  let outputBuffer = 0;
+function shipComputer({ utilities }) {
+  const { math } = utilities;
+  const { permutations } = math;
+  const computer = require('./computer/process');
 
   function processInput(input) {
-    let mem;
+    // const s3 = '3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5';
+    // let s4 = '3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,';
+    // s4 += '-5,54,1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,';
+    // s4 += '53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10';
+    // const srcCode = s4;
+    const srcCode = input.replace('\n', '');
 
-    const s0 = '3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0';
-    const s1 = '3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0';
-    const s2 = '3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0';
-    // const srcCode = s2;
-    const srcCode = input;
-    
-    let strongestOutput = 0;
-
-    const combs = createCombinations([0, 1, 2, 3, 4]);
-    // const combs = [[4,3,2,1,0]];
-    // const combs = [[0,1,2,3,4]];
-    // const combs = [[1,0,4,3,2]];
-    combs.map(cmb => {
-      // resets
-      outputBuffer = 0;
-      ampPhase = 0;
-      mem = initializeMemory(srcCode, ',');
-      phaseSettings = cmb.split(',');
-
-      // execute each amplifier procedss
-      processOpCode(0, mem);
-      processOpCode(0, mem);
-      processOpCode(0, mem);
-      processOpCode(0, mem);
-      processOpCode(0, mem);
-
-      // check results
-      if (!isNaN(outputBuffer) && outputBuffer > strongestOutput) {
-        console.log(`${outputBuffer} > ${strongestOutput}`);
-        strongestOutput = outputBuffer;
-      }
+    let combs = [];
+    const rawCombs = permutations.createCombinations([5, 6, 7, 8, 9]);
+    combs = rawCombs.map(str => {
+      return str.split(',');
     });
-    // const programAlarm = processOpCode(0, mem);
+    // combs = [[9, 8, 7, 6, 5]];
 
-    console.log(`Existing with output ${strongestOutput}`);
+    let strongestOutput = 0;
+    let results = combs.map(cmb => {
+      let thrust = tryCombo(srcCode, cmb);
+      if (thrust > strongestOutput) {
+        strongestOutput = thrust;
+      }
+      return strongestOutput;
+    });
+
+    strongestOutput = results[results.length - 1];
+    console.log(`Exiting with output ${strongestOutput}`);
     return strongestOutput;
   }
 
-  function initializeMemory(src, dlm) {
-    return src.split(dlm);
-  }
+  function tryCombo(srcCode, cmb) {
+    const program = srcCode.split(',');
+    let nm = 0;
+    const amps = cmb.map(phase => {
+      const pc = new computer(`amp${nm}`, program.slice());
+      let amplifier = pc.execute();
+      amplifier.next(); // get _READY_ for input
+      // console.log(`${pc.name} gets phase ${phase}`);
+      const state = amplifier.next(phase);
+      nm = nm + 1;
 
-  function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-  }
-
-  function createCombinations(poss) {
-    const combs = [];
-    if (poss.length === 1) {
-      combs.push(poss[0]);
-      return combs;
-    }
-    const arr = poss.slice();
-    const used = [];
-    let incs = 0;
-    const possibilities = factorial(arr.length);
-    while (incs < possibilities) {
-      const next = getRandomInt(arr.length);
-      if (used.indexOf(arr[next]) < 0) {
-        const c2 = arr[next];
-        used.push(c2);
-
-        const remainder = arr.slice();
-        remainder.splice(next, 1);
-        const theRest = createCombinations(remainder);
-        incs += theRest.length;
-        theRest.map((cmb) => combs.push(`${c2},${cmb}`));
-      }
-    }
-    return combs;
-  }
-
-  function factorial(n) {
-    if (n < 2) {
-      return 1;
-    }
-    return n * factorial(n - 1);
-  }
-
-  function processOpCode(pointer, mem) {
-    let newMem = mem;
-    const read = mem[pointer];
-    if (read === undefined) {
-      console.log('CRITCAL FAILURE; MEMORY DUMP');
-      console.log(mem);
-    }
-    const instruction = read.toString();
-    const len = instruction.length;
-    // let tmp = ("x" + pointer);
-    // console.log(`${tmp.substr(tmp.len-2,2)}: ${instruction}`);
-    let opCode;
-    let modes;
-    try {
-      opCode = Number(instruction.substr(len - 2));
-      if (len > 0) {
-        modes = instruction.substr(0, len - 2);
-      }
-    } catch (err) {
-      console.log(pointer, len);
-      console.log(err);
-    }
-
-    let prm = [];
-    switch (opCode) {
-      case 99:
-        // console.log('Exit program');
-        return;
-      case 1:
-      case 2:
-        prm = getParameterValues(mem, pointer, modes, 3, [2]);
-        newMem = setRegister(mem, prm[2], operations[opCode](prm[0], prm[1]));
-        break;
-      case 3:
-        prm = getParameterValues(mem, pointer, modes, 1, [0]);
-        let inputMode = (ampPhase % 2) === 0;
-        // console.log(`inputMode ${inputMode} outputBuffer ${outputBuffer}`);
-        let singleInput = inputMode ? Number(phaseSettings[(ampPhase / 2)]) : outputBuffer;
-        ampPhase = ampPhase + 1;
-        newMem = setRegister(mem, prm[0], singleInput);
-        break;
-      case 4:
-        prm = getParameterValues(mem, pointer, modes, 1, []);
-        // console.log(`OUTPUT: ${prm[0]}`);
-        outputBuffer = prm[0];
-        if (isNaN(outputBuffer)) {
-          console.log(`ERROR NaN`);
-          return;
-        }
-        // for now exit whenever we output
-        return;
-        break;
-      case 5:
-        prm = getParameterValues(mem, pointer, modes, 2, []);
-        if (prm[0] != 0) {
-          return processOpCode(prm[1], mem);
-        }
-        break;
-      case 6:
-        prm = getParameterValues(mem, pointer, modes, 2, []);
-        if (prm[0] == 0) {
-          return processOpCode(prm[1], mem);
-        }
-        break;
-      case 7:
-        prm = getParameterValues(mem, pointer, modes, 3, [2]);
-        setRegister(mem, prm[2], Number((prm[0] < prm[1])));
-        break;
-      case 8:
-        prm = getParameterValues(mem, pointer, modes, 3, [2]);
-        setRegister(mem, prm[2], Number((prm[0] === prm[1])));
-        break;
-      default:
-        break;
-    }
-
-    const nextInstruction = Number(pointer) + prm.length + 1;
-    return processOpCode(nextInstruction, newMem);
-  }
-
-  function getParameterValues(register, pointer, instr, min, force) {
-    const parameters = [];
-    let modeConfig = instr;
-    while (modeConfig.length < min) {
-      modeConfig = `0${modeConfig}`;
-    }
-    const modes = modeConfig.split('').reverse();
-    modes.map((mode, idx) => {
-      const ptr = pointer + idx + 1;
-      if (force.indexOf(idx) > -1) {
-        parameters.push(getValue(register, Number(ptr)));
-      } else {
-        const addr = mode === '0' ? register[ptr] : ptr;
-        parameters.push(getValue(register, Number(addr)));
-      }
-      return null;
+      return { pc, amplifier, state };
     });
 
-    return parameters;
-  }
+    let power = 0;
+    while (amps[amps.length - 1].state.done === false) {
+      for (const amp of amps) {
+        const { pc, amplifier } = amp;
 
-  function getValue(register, addr) {
-    return Number(register[addr]);
-  }
+        //console.log(`${pc.name} gets ${power} power`);
 
-  function setRegister(mem, pointer, value) {
-    const register = mem;
-    register[pointer] = value;
-    return register;
+        const transfer = amplifier.next(power);
+        const exhaust = amplifier.next(); // get ready for INPUT
+
+        if (exhaust.done && isNaN(exhaust.value.val)) {
+          console.log(exhaust);
+        }
+        power = exhaust.done ? exhaust.value.val : transfer.value.val;
+
+        // console.log(transfer);
+        // console.log(`power now ${power}`);
+
+        if (exhaust.done) {
+          amp.state = exhaust;
+        }
+      }
+    }
+
+    return power;
   }
 
   return {
@@ -206,3 +79,5 @@ function shipComputer() {
 }
 
 module.exports = shipComputer;
+
+// https://dev.to/jbristow/advent-of-code-2019-solution-megathread-day-7-amplification-circuit-1fpl
