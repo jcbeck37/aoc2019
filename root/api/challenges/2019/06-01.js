@@ -5,9 +5,11 @@ function orbitMapper() {
     //let skyMap = s0.split('\n');
     let skyMap = input.split(splitter);
 
-    let spaceTrash = skyMap.pop();
-    console.log(spaceTrash);
-
+    if (skyMap[skyMap.length] === "") {
+      let spaceTrash = skyMap.pop();
+      console.log(spaceTrash);
+    }
+    
     let data = {};
     skyMap.map(orbit => {
       let center = orbit.split(')')[0];

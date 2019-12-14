@@ -1,13 +1,18 @@
 function orbitMapper() {
-
+  const center = "COM";
+  const me = "YOU";
+  const santa = "SAN";
 
   function processInput(input) {
-    const s0 = "COM)B\nB)C\nC)D\nD)E\nE)F\nB)G\nG)H\nD)I\nE)J\nJ)K\nK)L\nK)YOU\nI)SAN";
-    let skyMap = s0.split('\n');
-    //let skyMap = input.split('\n');
+    let splitter = endOfLine = require('os').EOL;
+    //const s0 = "COM)B|B)C|C)D|D)E|E)F|B)G|G)H|D)I|E)J|J)K|K)L|K)YOU|I)SAN";
+    //let skyMap = s0.split('|');
+    let skyMap = input.split(splitter);
 
-    let spaceTrash = skyMap.pop();
-    console.log(spaceTrash);
+    if (skyMap[skyMap.length] === "") {
+      let spaceTrash = skyMap.pop();
+      console.log(spaceTrash);
+    }
 
     let data = {};
     skyMap.map(orbit => {
@@ -25,40 +30,60 @@ function orbitMapper() {
         };
       }
     });
-    //console.log(map);
-    //console.log(data);
-    let orbitCount = 0;
-    // Object.entries(data).forEach(([key, value]) => {
-    //   orbitCount = orbitCount + value.direct + countOrbits(value);
-    //   return null;
-    // });
-    
 
-
-    return orbitCount;
+    return findPath(data, me, [me]);
   }
 
-  function countOrbits(obj) {
-    let objIndirects = 0;
-    obj.orbits.map(orbit => {
-      objIndirects = objIndirects + countIndirect(data, orbit);
+  function findPath(data, orbit, exclude) {
+    // console.log(`Seeking ${santa} through jump to ${orbit} through path ${exclude}`);
+
+    let point = data[orbit];
+    let set1 = point.orbits.map(nextOrbit => {
+      if (exclude.indexOf(nextOrbit) > -1) {
+        return null;
+      }
+      if (nextOrbit === center) {
+        // dead end
+        return null;
+      }
+      let newExclude = exclude.slice();
+      newExclude.push(nextOrbit);
+      return findPath(data, nextOrbit, newExclude);
+    });
+
+    let set2 = [];
+    Object.entries(data).forEach(([key, value]) => {
+      // if this item orbits our current center
+      if (value.orbits.indexOf(orbit) > -1) {
+        if (key === santa) {
+          console.log(`Found in orbit of ${orbit} through path ${exclude}`);
+          const hops = exclude.length - 2; // you and Santa do not count
+          set2.push(hops);
+        } else if (exclude.indexOf(key) > -1) {
+          // do nothing
+        } else {
+          let newExclude = exclude.slice();
+          newExclude.push(key);
+          set2.push(findPath(data, key, newExclude));
+        }
+      };
+    });
+
+    let best = null;
+    set1.map(path => {
+      if (path !== null && (best === null || path < best)) {
+        best = path;
+      }
       return null;
     });
-    console.log(`Obj ${obj} orbits ${objIndirects}`);
-    return obj.direct + objIndirects;
-  }
+    set2.map(path => {
+      if (path !== null && (best === null || path < best)) {
+        best = path;
+      }
+      return null;
+    });
 
-  function countIndirect(data, obj) {
-    if (obj === "COM") {
-      return 0;
-    }
-    let indirect = 0;
-    if (data[obj].orbits !== undefined) {
-      data[obj].orbits.map(obj2 => {
-        indirect = indirect + 1 + countIndirect(data, obj2);
-      });
-    }
-    return indirect;
+    return best;
   }
 
   return {
