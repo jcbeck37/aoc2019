@@ -2,9 +2,10 @@ function orbitMapper() {
 
 
   function processInput(input) {
+    let splitter = endOfLine = require('os').EOL;
     //const s0 = "COM)B\nB)C\nC)D\nD)E\nE)F\nB)G\nG)H\nD)I\nE)J\nJ)K\nK)L";
     //let skyMap = s0.split('\n');
-    let skyMap = input.split('\n');
+    let skyMap = input.split(splitter);
 
     let spaceTrash = skyMap.pop();
     console.log(spaceTrash);
@@ -48,10 +49,14 @@ function orbitMapper() {
       return 0;
     }
     let indirect = 0;
-    if (data[obj].orbits !== undefined) {
-      data[obj].orbits.map(obj2 => {
-        indirect = indirect + 1 + countIndirect(data, obj2);
-      });
+    try {
+      if (data[obj].orbits !== undefined) {
+        data[obj].orbits.map(obj2 => {
+          indirect = indirect + 1 + countIndirect(data, obj2);
+        });
+      }
+    } catch (err) {
+      console.log(`data[${obj}] is undefined`);
     }
     return indirect;
   }
