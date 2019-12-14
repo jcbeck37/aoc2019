@@ -7,7 +7,7 @@ function shipComputer() {
   inputs.push(1);
 
   function processInput(input) {
-    let mem = input.split(',');
+    const mem = input.split(',');
 
     // sample override
     // mem = '1002,4,3,4,33'.split(',');
@@ -61,18 +61,18 @@ function shipComputer() {
   }
 
   function getParameterValues(register, pointer, instr, min, force) {
-    let parameters = [];
+    const parameters = [];
     let modeConfig = instr;
     while (modeConfig.length < min) {
       modeConfig = `0${modeConfig}`;
     }
     const modes = modeConfig.split('').reverse();
     modes.map((mode, idx) => {
-      let ptr = pointer + idx + 1;
+      const ptr = pointer + idx + 1;
       if (force.indexOf(idx) > -1) {
         parameters.push(getValue(register, Number(ptr)));
       } else {
-        const addr = mode === "0" ? register[ptr] : ptr;
+        const addr = mode === '0' ? register[ptr] : ptr;
         parameters.push(getValue(register, Number(addr)));
       }
       return null;

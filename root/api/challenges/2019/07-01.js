@@ -4,24 +4,62 @@ function shipComputer() {
   operations[2] = function (a, b) { return a * b; };
 
   const inputs = [];
-  inputs.push(5);
 
   function processInput(input) {
-    const mem = input.split(',');
+    let mem;
 
-    // sample override
-    // mem = '1002,4,3,4,33'.split(',');
-    // s0 = '3,9,8,9,10,9,4,9,99,-1,8'.split(',');
+    const s0 = '3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0';
 
-    // let s1 = '3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,';
-    // s1 += '1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,';
-    // s1 += '999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99';
-    // mem = s1.split(',');
+    mem = initializeMemory(s0, ',');
 
-    const programAlarm = processOpcode(0, mem);
+    const combs = createCombinations([0, 1, 2, 3, 4]);
+    // const programAlarm = processOpcode(0, mem);
 
-    // console.log(finalComputer.toString());
-    return programAlarm[0];
+    return combs;
+  }
+
+  function initializeMemory(src, dlm) {
+    return src.split(dlm);
+  }
+
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
+
+  function createCombinations(poss) {
+    const combs = [];
+    if (poss.length === 1) {
+      combs.push(poss[0]);
+      return combs;
+    }
+    const arr = poss.slice();
+    const used = [];
+    let incs = 0;
+    const possibilities = factorial(arr.length);
+    while (incs < possibilities) {
+      const next = getRandomInt(arr.length);
+      if (used.indexOf(arr[next]) < 0) {
+        const c2 = arr[next];
+        used.push(c2);
+
+        const remainder = arr.slice();
+        remainder.splice(next, 1);
+        const theRest = createCombinations(remainder);
+        incs += theRest.length;
+        theRest.map((cmb) => {
+          const variation = `${c2},${cmb}`;
+          combs.push(`${c2},${cmb}`);
+        });
+      }
+    }
+    return combs;
+  }
+
+  function factorial(n) {
+    if (n < 2) {
+      return 1;
+    }
+    return n * factorial(n - 1);
   }
 
   function processOpcode(pointer, mem) {
@@ -64,13 +102,13 @@ function shipComputer() {
       break;
     case 5:
       prm = getParameterValues(mem, pointer, modes, 2, []);
-      if (prm[0] !== 0) {
+      if (prm[0] != 0) {
         return processOpcode(prm[1], mem);
       }
       break;
     case 6:
       prm = getParameterValues(mem, pointer, modes, 2, []);
-      if (prm[0] === 0) {
+      if (prm[0] == 0) {
         return processOpcode(prm[1], mem);
       }
       break;
