@@ -3,6 +3,7 @@ function computer(name, program) {
     this.mem = program;
     this.pointer = 0;
     this.output;
+    this.relativeBase = 0;
 
     const operations = [];
     operations[1] = function (a, b) { return a + b; };
@@ -30,17 +31,18 @@ function computer(name, program) {
         JUMP_IF_FALSE: 6,
         SET_IF_LESS: 7,
         SET_IF_EQUAL: 8,
+        ADJUST_BASE: 9,
         HALT: 99
     };
-    const LABELS = ['', 'ADD', 'MUL', 'INP', 'OUT', 'JIT', 'JIF', 'SIL', 'SIE'];
+    const LABELS = ['', 'ADD', 'MUL', 'INP', 'OUT', 'JIT', 'JIF', 'SIL', 'SIE', 'ADJ'];
 
     this.execute = function* () {
         let running = true;
         while (running) {
             const opCode = this.nextInstruction();
-            // if (opCode <= LABELS.length) {
-            //     console.log(`${this.name} pointer ${this.pointer} op ${LABELS[opCode]} prm ${this.prm}`);
-            // }
+            if (opCode <= LABELS.length) {
+                // console.log(`${this.name} pointer ${this.pointer} op ${LABELS[opCode]} prm ${this.prm}`);
+            }
             switch (opCode) {
                 case INSTRUCTION.ADD:
                 case INSTRUCTION.MULTIPLY:
@@ -81,6 +83,10 @@ function computer(name, program) {
                     this.setRegister(this.prm[2], Number((this.prm[0] === this.prm[1])));
                     this.nextPointer();
                     break;
+                case INSTRUCTION.ADJUST_BASE:
+                    this.relativeBase = this.relativeBase + this.prm[0];
+                    this.nextPointer();
+                    break;
                 case INSTRUCTION.HALT:
                     console.log(`${this.name} completed; output: ${this.output}`);
                     return { type: 'FINAL', val: this.output };
@@ -97,8 +103,8 @@ function computer(name, program) {
         }
     };
 
-    const parameterCounts = [-1, 3, 3, 1, 1, 2, 2, 3, 3];
-    const outputParameters = [-1, 2, 2, 0, -1, -1, -1, 2, 2];
+    const parameterCounts = [-1, 3, 3, 1, 1, 2, 2, 3, 3, 1];
+    const outputParameters = [-1, 2, 2, 0, -1, -1, -1, 2, 2, -1];
     this.getParameterValues = function (instr, opCode) {
         const parameters = [];
         if (opCode > parameterCounts.length) {
@@ -112,11 +118,24 @@ function computer(name, program) {
         modes.map((mode, idx) => {
             const ptr = this.pointer + idx + 1;
             if (idx === outputParameters[opCode]) {
-                parameters.push(this.getValue(ptr));
+                const pos = mode === '2' ? this.relativeBase + this.getValue(ptr) : this.getValue(ptr);
+                parameters.push(pos);
             } else {
-                const addr = mode === '0' ? this.mem[ptr] : ptr;
+                let addr;
+                switch (mode) {
+                    case '0': // position
+                        addr = this.getValue(ptr);
+                        break;
+                    case '1': // immediate
+                        addr = ptr;
+                        break;
+                    case '2': // relative position
+                        addr = this.relativeBase + this.getValue(ptr);
+                        break;
+                }
                 parameters.push(this.getValue(addr));
             }
+
             return null;
         });
 
@@ -127,7 +146,15 @@ function computer(name, program) {
     };
 
     this.getValue = function (addr) {
-        return Number(this.mem[addr]);
+        let val = this.mem[Number(addr)];
+        if (val === undefined) {
+            val = this.mem[Number(addr)] = 0;
+            // console.log(addr);
+        }
+        if (isNaN(val) && val.indexOf(',') > - 1) {
+            return val;
+        }
+        return Number(val);
     };
 
     this.setRegister = function (pointer, value) {
