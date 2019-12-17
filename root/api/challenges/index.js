@@ -15,6 +15,8 @@ function challenges(dependencies) {
   collection2019['06-02'] = require('./2019/06-02.js')(dependencies);
   collection2019['07-01'] = require('./2019/07-01.js')(dependencies);
   collection2019['07-02'] = require('./2019/07-02.js')(dependencies);
+  collection2019['08-01'] = require('./2019/08-01.js')(dependencies);
+  collection2019['08-02'] = require('./2019/08-02.js')(dependencies);
 
   const years = {};
   years['2019'] = collection2019;
