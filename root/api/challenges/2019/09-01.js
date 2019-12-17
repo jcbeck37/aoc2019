@@ -13,7 +13,22 @@ function shipComputer() {
       result = executor.next();
       console.log(result);
     }
-    return result.value.val;
+
+    // part 2
+    const boostProgram2 = new computer('BOOST', input.replace('\n','').split(','));
+    const executor2 = boostProgram2.execute();
+    let result2 = executor2.next(); // init
+    result2 = executor2.next(2); // input
+    console.log(result2);
+    while (!result2.done) {
+      result2 = executor2.next();
+      console.log(result2);
+    }
+
+    return {
+      part1: result.value.val,
+      part2: result2.value.val
+    };
   }
 
   function runTests() {
