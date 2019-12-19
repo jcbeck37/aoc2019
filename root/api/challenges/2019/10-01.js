@@ -1,15 +1,28 @@
 function mapAnalyzer() {
+  const { buildSpaceMap, plotAsteroids, countVisible, createPatrol, zap } = require("./10.01.utils")();
+  const { runTests } = require("./10.01.tests")();
   this.asteroids = [];
+  this.patrol = [];
+
   function processInput(input) {
-    // return runTests();
+    // let testResults = runTests();
+    // let newStation = testResults[testResults.length - 1].newStation;
+    // let finalAsteroid = testResults[testResults.length - 1].finalAsteroid;
 
     // failures 254 (too low)
-    return runPart1(input);
+    let newStation = runPart1(input);
+
+    let finalAsteroid = runPart2(newStation);
+
+    return {
+      part1: newStation,
+      part2: finalAsteroid // 915 is too high, 305 is too low
+    }
   };
 
   function runPart1(input) {
     let spaceMap = buildSpaceMap(input);
-    plotAsteroids(spaceMap);
+    this.asteroids = plotAsteroids(spaceMap);
 
     let results = this.asteroids.map(prospect => countVisible(prospect));
     let bestAsteroid = { los: 0 };
@@ -18,150 +31,32 @@ function mapAnalyzer() {
         bestAsteroid = res;
       }
     });
-    console.log(bestAsteroid);
-    return bestAsteroid.los;
+    // console.log(bestAsteroid);
+    return bestAsteroid;
   }
 
-  function runTests() {
-    let tests = getTests();
-    tests.map(test => {
-      let graph = test.replace(/\./g, '_');
-      console.log('_012345678901234567890123456789'.substr(0, graph.split('\n').length));
-      graph.split('\n').map((ln, idx) => {
-        console.log(`${idx}${ln}`);
-      });
+  function runPart2(station) {
+    this.asteroids = this.asteroids.filter(a => a !== station);
+    this.patrol = createPatrol(station, this.asteroids);
 
-      let spaceMap = buildSpaceMap(test);
-      this.asteroids = plotAsteroids(spaceMap);
-      console.log(`==============`);
-      let results = this.asteroids.map(prospect => countVisible(prospect));
-      let bestAsteroid = { los: 0 };
-      results.map(res => {
-        if (res.los > bestAsteroid.los) {
-          bestAsteroid = res;
-        }
-      });
-      console.log(bestAsteroid);
-      console.log(`==============`);
-      return bestAsteroid;
-    });
-  }
+    let result = { zapped: 0, zap200: null };
+    let remaining = this.patrol.filter(a => a.zapped === 0).length;
+    console.log(`start with ${remaining}`);
+    while (remaining > 0) {
+      result = zap(90, 0, result);
+      result = zap(360, 270, result);
+      result = zap(270, 180, result);
+      result = zap(180, 90, result);
 
-  function getTests() {
-    let tests = [];
+      remaining = this.patrol.filter(a => a.zapped === 0).length;
+      console.log(result.zapped, remaining);
+    }
 
-    // 3,4 with 8
-    let test1 = '.#..#\n';
-    test1 += '.....\n';
-    test1 += '#####\n';
-    test1 += '....#\n';
-    test1 += '...##\n';
-    tests.push(test1);
-
-    // 5,8 with 33
-    test1 = '......#.#.\n';
-    test1 += '#..#.#....\n';
-    test1 += '..#######.\n';
-    test1 += '.#.#.###..\n';
-    test1 += '.#..#.....\n';
-    test1 += '..#....#.#\n';
-    test1 += '#..#....#.\n';
-    test1 += '.##.#..###\n';
-    test1 += '##...#..#.\n';
-    test1 += '.#....####';
-    tests.push(test1);
-
-    // 11,13 with 210 
-    test1 = '.#..##.###...#######\n';
-    test1 += '##.############..##.\n';
-    test1 += '.#.######.########.#\n';
-    test1 += '.###.#######.####.#.\n';
-    test1 += '#####.##.#.##.###.##\n';
-    test1 += '..#####..#.#########\n';
-    test1 += '####################\n';
-    test1 += '#.####....###.#.#.##\n';
-    test1 += '##.#################\n';
-    test1 += '#####.##.###..####..\n';
-    test1 += '..######..##.#######\n';
-    test1 += '####.##.####...##..#\n';
-    test1 += '.#####..#.######.###\n';
-    test1 += '##...#.##########...\n';
-    test1 += '#.##########.#######\n';
-    test1 += '.####.#.###.###.#.##\n';
-    test1 += '....##.##.###..#####\n';
-    test1 += '.#.#.###########.###\n';
-    test1 += '#.#.#.#####.####.###\n';
-    test1 += '###.##.####.##.#..##\n';
-    tests.push(test1);
-
-    return tests;
-  }
-
-  function buildSpaceMap(raw) {
-    let spaceMap = [];
-    let lines = raw.split('\n');
-    lines.map((line, idx) => {
-      if (line !== '') {
-        spaceMap[idx] = line.split('');
-      }
-    });
-    return spaceMap;
-  }
-
-  function plotAsteroids(spaceMap) {
-    spaceMap.map((line, row) => {
-      line.map((point, col) => {
-        // console.log(point);
-        if (point === "#") {
-          // console.log(`Asteroid at (${row},${col})`);
-          this.asteroids.push({ row, col });
-        }
-      });
-    });
-  }
-
-  function isBetween(a, b, c) {
-    return (a < b && b < c) || (a > b && b > c);
-  }
-
-  function countVisible(p) { // p = prospect
-    let matches = this.asteroids.filter(a => a !== p).map(a => {
-      let x = a.row - p.row;
-      let y = a.col - p.col;
-
-      const angle = Math.atan2(y, x);
-      let blockers = this.asteroids.filter(f => {
-        if (f === p || f === a) {
-          return false;
-        }
-        let fx = f.row - p.row;
-        let fy = f.col - p.col;
-        const fAngle = Math.atan2(fy, fx);
-        if (fAngle != angle) {
-          return false;
-        }
-
-        if (isBetween(p.row, f.row, a.row) || isBetween(p.col, f.col, a.col)) {
-          // console.log(p, a, x, y, angle);
-          // console.log(p, f, fx, fy, fAngle);
-          // console.log('--------------');
-          return true;
-        }
-
-        return false;
-      });
-
-      return Number(blockers.length === 0);
-    });
-
-    return {
-      p,
-      los: matches.filter(m => m > 0).length
-    };
+    return result.zap200; //200th
   }
 
   return {
-    processInput,
+    processInput
   };
 }
 
