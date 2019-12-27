@@ -10,6 +10,7 @@ function moonWatching() {
 
     let part1 = runPart1(input);
     let part2 = runPart2(input); // 187590629406 too low
+                                 // 400128139852752
     return { part1, part2 };
   }
 

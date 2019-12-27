@@ -25,6 +25,9 @@ function orbitMapper() {
           orbits: data[satellite].orbits.push(center)
         };
       }
+      if (center === "") {
+        console.log(orbit);
+      }
     });
     //console.log(map);
     //console.log(data);
