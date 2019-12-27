@@ -5,7 +5,7 @@ function orbitMapper() {
     //let skyMap = s0.split('\n');
     let skyMap = input.split(splitter);
 
-    if (skyMap[skyMap.length] === "") {
+    if (skyMap[skyMap.length] === "" || skyMap[skyMap.length] === undefined) {
       let spaceTrash = skyMap.pop();
       console.log(spaceTrash);
     }

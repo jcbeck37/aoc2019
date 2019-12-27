@@ -3,7 +3,7 @@ function arcadeCabinet() {
 
   function processInput(input) {
     let part1Input = input.replace('\n', '').split(',');
-    ///let result1 = loadCabinet(part1Input);
+    let result1 = loadCabinet(part1Input);
 
     // set quarters
     part1Input[0] = 2;
@@ -11,7 +11,8 @@ function arcadeCabinet() {
     let result2 = loadCabinet(part2Input);
 
     return {
-      //part1: result1.blockTiles
+      part1: result1.blockTiles,
+      part2: result2.score
     };
   }
 
@@ -82,7 +83,8 @@ function arcadeCabinet() {
           drawScreen(objects);
     // console.log(`Block tile count: ${blockTiles}`);
     return {
-      blockTiles
+      blockTiles,
+      score
     };
   }
 
